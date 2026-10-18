@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Employees page -->
+  <data name="Employees" xml:space="preserve"><value>الموظفون</value></data>
+  <data name="New employee" xml:space="preserve"><value>موظف جديد</value></data>
+  <data name="Edit employee" xml:space="preserve"><value>تعديل موظف</value></data>
+  <data name="Full name" xml:space="preserve"><value>الاسم الكامل</value></data>
+  <data name="Department" xml:space="preserve"><value>القسم</value></data>
+  <data name="No employees yet." xml:space="preserve"><value>لا يوجد موظفون بعد.</value></data>
+  <data name="Edit" xml:space="preserve"><value>تعديل</value></data>
+  <data name="Delete" xml:space="preserve"><value>حذف</value></data>
+  <data name="Confirm delete" xml:space="preserve"><value>تأكيد الحذف</value></data>
+  <data name="Cancel" xml:space="preserve"><value>إلغاء</value></data>
+  <data name="Save" xml:space="preserve"><value>حفظ</value></data>
+  <data name="Close" xml:space="preserve"><value>إغلاق</value></data>
+  <data name="Employee created." xml:space="preserve"><value>تم إنشاء الموظف.</value></data>
+  <data name="Employee updated." xml:space="preserve"><value>تم تحديث الموظف.</value></data>
+  <data name="Employee deleted." xml:space="preserve"><value>تم حذف الموظف.</value></data>
+
+  <!-- History panel -->
+  <data name="History" xml:space="preserve"><value>السجل</value></data>
+  <data name="History of {0}" xml:space="preserve"><value>سجل تغييرات {0}</value></data>
+  <data name="No history." xml:space="preserve"><value>لا يوجد سجل.</value></data>
+  <data name="Time" xml:space="preserve"><value>الوقت</value></data>
+  <data name="Action" xml:space="preserve"><value>العملية</value></data>
+  <data name="User" xml:space="preserve"><value>المستخدم</value></data>
+  <data name="Changes" xml:space="preserve"><value>التغييرات</value></data>
+  <data name="Create" xml:space="preserve"><value>إنشاء</value></data>
+  <data name="Update" xml:space="preserve"><value>تحديث</value></data>
+
+  <!-- Messages thrown by the HR service (shown through L[ex.Message]) -->
+  <data name="Full name is required." xml:space="preserve"><value>الاسم الكامل مطلوب.</value></data>
+  <data name="Full name is too long (200 characters at most)." xml:space="preserve"><value>الاسم الكامل طويل جداً (200 حرف كحد أقصى).</value></data>
+  <data name="Department is too long (100 characters at most)." xml:space="preserve"><value>القسم طويل جداً (100 حرف كحد أقصى).</value></data>
+  <data name="Employee not found." xml:space="preserve"><value>لم يتم العثور على الموظف.</value></data>
+  <data name="You do not have permission to perform this action." xml:space="preserve"><value>ليست لديك صلاحية لتنفيذ هذا الإجراء.</value></data>
+</root>

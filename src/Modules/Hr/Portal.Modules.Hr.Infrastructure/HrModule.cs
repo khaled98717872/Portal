@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Portal.Modules.Hr.Application;
 using Portal.Modules.Hr.Contracts;
-using Portal.Modules.Hr.Domain;
 using Portal.SharedKernel.Authorization;
 using Portal.SharedKernel.Modules;
 using Portal.SharedKernel.Tenancy;
@@ -31,6 +30,7 @@ public sealed class HrModule : IModule
     public void RegisterServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddTenantDbContext<HrDbContext>(HrDbContext.Schema);
+        services.AddScoped<IEmployeeService, EmployeeService>();
     }
 
     public void MapEndpoints(IEndpointRouteBuilder endpoints)
@@ -48,41 +48,40 @@ public sealed class HrModule : IModule
                 : Results.BadRequest(new { error = "Tenant is required." });
         });
 
-        employees.MapGet("/", async (HrDbContext db, CancellationToken ct) =>
-                Results.Ok(await db.Employees.AsNoTracking().ToListAsync(ct)))
+        employees.MapGet("/", async (IEmployeeService service, CancellationToken ct) =>
+                Results.Ok(await service.ListAsync(ct)))
             .RequireAuthorization(HrPermissions.Employees.Read);
 
-        employees.MapPost("/", async (EmployeeRequest req, HrDbContext db, CancellationToken ct) =>
+        employees.MapPost("/", async (EmployeeRequest req, IEmployeeService service, CancellationToken ct) =>
             {
-                var employee = new Employee { FullName = req.FullName, Department = req.Department };
-                db.Employees.Add(employee);
-                await db.SaveChangesAsync(ct);
-                return Results.Created($"/api/hr/employees/{employee.Id}", employee);
+                try
+                {
+                    var employee = await service.CreateAsync(new EmployeeInput(req.FullName, req.Department), ct);
+                    return Results.Created($"/api/hr/employees/{employee.Id}", employee);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
             })
             .RequireAuthorization(HrPermissions.Employees.Create);
 
-        employees.MapPut("/{id:guid}", async (Guid id, EmployeeRequest req, HrDbContext db, CancellationToken ct) =>
+        employees.MapPut("/{id:guid}", async (Guid id, EmployeeRequest req, IEmployeeService service, CancellationToken ct) =>
             {
-                var employee = await db.Employees.FirstOrDefaultAsync(x => x.Id == id, ct);
-                if (employee is null) return Results.NotFound();
-
-                employee.FullName = req.FullName;
-                employee.Department = req.Department;
-                await db.SaveChangesAsync(ct);
-                return Results.Ok(employee);
+                try
+                {
+                    var updated = await service.UpdateAsync(id, new EmployeeInput(req.FullName, req.Department), ct);
+                    return updated is null ? Results.NotFound() : Results.Ok(updated);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    return Results.BadRequest(new { error = ex.Message });
+                }
             })
             .RequireAuthorization(HrPermissions.Employees.Update);
 
-        employees.MapDelete("/{id:guid}", async (Guid id, HrDbContext db, CancellationToken ct) =>
-            {
-                var employee = await db.Employees.FirstOrDefaultAsync(x => x.Id == id, ct);
-                if (employee is null) return Results.NotFound();
-
-                db.Employees.Remove(employee);
-                await db.SaveChangesAsync(ct);
-                return Results.NoContent();
-            })
+        employees.MapDelete("/{id:guid}", async (Guid id, IEmployeeService service, CancellationToken ct) =>
+                await service.DeleteAsync(id, ct) ? Results.NoContent() : Results.NotFound())
             .RequireAuthorization(HrPermissions.Employees.Delete);
     }
 }
-

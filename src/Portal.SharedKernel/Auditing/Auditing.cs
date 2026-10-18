@@ -7,6 +7,7 @@ public interface ICurrentUser
     bool IsAuthenticated { get; }
     string? Id { get; }
     string? Name { get; }
+    bool HasPermission(string permission);
 }
 
 [AttributeUsage(AttributeTargets.Property)]
@@ -32,3 +33,4 @@ public class AuditEntry : ITenantScoped
     public string? TraceId { get; set; }
     public string Changes { get; set; } = "{}";
 }
+

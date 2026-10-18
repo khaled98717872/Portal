@@ -1,0 +1,263 @@
+﻿@page "/hr"
+@attribute [Authorize(Policy = HrPermissions.Employees.Read)]
+@inject IEmployeeService Service
+
+<PageTitle>@L["Employees"]</PageTitle>
+
+<h3>@L["Employees"]</h3>
+
+@if (_message is not null)
+{
+    <div class="alert alert-success py-2">@_message</div>
+}
+@if (_error is not null)
+{
+    <div class="alert alert-danger py-2">@_error</div>
+}
+
+<AuthorizeView Policy="@HrPermissions.Employees.Create">
+    <button class="btn btn-primary btn-sm mb-3" @onclick="StartCreate">@L["New employee"]</button>
+</AuthorizeView>
+
+<table class="table table-sm align-middle">
+    <thead>
+        <tr>
+            <th>@L["Full name"]</th>
+            <th>@L["Department"]</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (_items.Count == 0)
+        {
+            <tr>
+                <td colspan="3" class="text-muted">@L["No employees yet."]</td>
+            </tr>
+        }
+        @foreach (var emp in _items)
+        {
+            <tr>
+                <td>@emp.FullName</td>
+                <td>@emp.Department</td>
+                <td class="text-end">
+                    <AuthorizeView Policy="@HrPermissions.Employees.Update">
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => StartEdit(emp)">@L["Edit"]</button>
+                    </AuthorizeView>
+                    <AuthorizeView Policy="@HrPermissions.Audit.Read">
+                        <button class="btn btn-outline-info btn-sm" @onclick="() => ShowHistory(emp)">@L["History"]</button>
+                    </AuthorizeView>
+                    <AuthorizeView Policy="@HrPermissions.Employees.Delete">
+                        @if (_confirmDeleteId == emp.Id)
+                        {
+                            <button class="btn btn-danger btn-sm" @onclick="() => Delete(emp)">@L["Confirm delete"]</button>
+                            <button class="btn btn-link btn-sm" @onclick="() => _confirmDeleteId = null">@L["Cancel"]</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline-danger btn-sm" @onclick="() => _confirmDeleteId = emp.Id">@L["Delete"]</button>
+                        }
+                    </AuthorizeView>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (_mode != Mode.None)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5>@(_mode == Mode.Create ? L["New employee"] : L["Edit employee"])</h5>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">@L["Full name"]</label>
+                    <input class="form-control" @bind="_fullName" maxlength="200" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Department"]</label>
+                    <input class="form-control" @bind="_department" maxlength="100" />
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm" @onclick="Save">@L["Save"]</button>
+                <button class="btn btn-link btn-sm" @onclick="CloseForm">@L["Cancel"]</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_historyOf is not null)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">@(L["History of {0}", _historyOf.FullName])</h5>
+                <button class="btn btn-link btn-sm" @onclick="CloseHistory">@L["Close"]</button>
+            </div>
+
+            @if (_history.Count == 0)
+            {
+                <p class="text-muted mt-3">@L["No history."]</p>
+            }
+            else
+            {
+                <table class="table table-sm mt-3">
+                    <thead>
+                        <tr>
+                            <th>@L["Time"]</th>
+                            <th>@L["Action"]</th>
+                            <th>@L["User"]</th>
+                            <th>@L["Changes"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in _history)
+                        {
+                            <tr>
+                                <td class="text-nowrap">@item.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@L[item.Action]</td>
+                                <td>@item.UserName</td>
+                                <td dir="ltr" class="small">@FormatChanges(item.Changes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private enum Mode { None, Create, Edit }
+
+    private IReadOnlyList<EmployeeDto> _items = [];
+    private Mode _mode;
+    private Guid? _editingId;
+    private Guid? _confirmDeleteId;
+    private string _fullName = "";
+    private string _department = "";
+    private EmployeeDto? _historyOf;
+    private IReadOnlyList<EmployeeHistoryItem> _history = [];
+    private string? _message;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync() => await Run(Reload);
+
+    private async Task Reload() => _items = await Service.ListAsync();
+
+    private void StartCreate()
+    {
+        Clear();
+        _mode = Mode.Create;
+        _editingId = null;
+        _fullName = "";
+        _department = "";
+        _historyOf = null;
+    }
+
+    private void StartEdit(EmployeeDto employee)
+    {
+        Clear();
+        _mode = Mode.Edit;
+        _editingId = employee.Id;
+        _fullName = employee.FullName;
+        _department = employee.Department ?? "";
+        _historyOf = null;
+    }
+
+    private async Task Save() =>
+        await Run(async () =>
+        {
+            var input = new EmployeeInput(_fullName, _department);
+
+            if (_mode == Mode.Create)
+            {
+                await Service.CreateAsync(input);
+                _message = L["Employee created."];
+            }
+            else if (_editingId is { } id)
+            {
+                var updated = await Service.UpdateAsync(id, input);
+                if (updated is null) throw new InvalidOperationException("Employee not found.");
+                _message = L["Employee updated."];
+            }
+
+            CloseForm();
+            await Reload();
+        });
+
+    private async Task Delete(EmployeeDto employee) =>
+        await Run(async () =>
+        {
+            _confirmDeleteId = null;
+            if (!await Service.DeleteAsync(employee.Id))
+                throw new InvalidOperationException("Employee not found.");
+
+            _message = L["Employee deleted."];
+            await Reload();
+        });
+
+    private async Task ShowHistory(EmployeeDto employee) =>
+        await Run(async () =>
+        {
+            _history = await Service.GetHistoryAsync(employee.Id);
+            _historyOf = employee;
+            CloseForm();
+        });
+
+    private void CloseForm()
+    {
+        _mode = Mode.None;
+        _editingId = null;
+    }
+
+    private void CloseHistory() => _historyOf = null;
+
+    private static string FormatChanges(string json)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            var parts = new List<string>();
+
+            foreach (var field in doc.RootElement.EnumerateObject())
+            {
+                if (field.Name == "Id") continue;
+
+                var oldValue = field.Value.TryGetProperty("old", out var o) ? o.ToString() : null;
+                var newValue = field.Value.TryGetProperty("new", out var n) ? n.ToString() : null;
+
+                parts.Add(oldValue is not null && newValue is not null
+                    ? $"{field.Name}: {oldValue} -> {newValue}"
+                    : $"{field.Name}: {newValue ?? oldValue}");
+            }
+
+            return string.Join("; ", parts);
+        }
+        catch (JsonException)
+        {
+            return json;
+        }
+    }
+
+    private async Task Run(Func<Task> action)
+    {
+        Clear();
+        try
+        {
+            await action();
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or UnauthorizedAccessException)
+        {
+            _error = L[ex.Message];
+        }
+    }
+
+    private void Clear()
+    {
+        _message = null;
+        _error = null;
+    }
+}
