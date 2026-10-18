@@ -1,0 +1,43 @@
+﻿@page "/account/login"
+@using System.Globalization
+@using Microsoft.Extensions.Localization
+@model Portal.Identity.Pages.Account.LoginModel
+@inject IStringLocalizer<Portal.Identity.SharedResource> L
+@{
+    Layout = null;
+    var culture = CultureInfo.CurrentUICulture;
+    var otherCulture = culture.TwoLetterISOLanguageName == "ar" ? "en-GB" : "ar-OM";
+    var otherName = CultureInfo.GetCultureInfo(otherCulture).Parent.NativeName;
+    var back = Uri.EscapeDataString(Model.Request.Path + Model.Request.QueryString);
+}
+<!DOCTYPE html>
+<html lang="@culture.TwoLetterISOLanguageName" dir="@(culture.TextInfo.IsRightToLeft ? "rtl" : "ltr")">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@L["Portal sign in"]</title>
+    <style>
+        body { font-family: "Segoe UI", Tahoma, system-ui, sans-serif; background: #f4f5f7; display: flex; justify-content: center; padding-top: 12vh; }
+        form { background: #fff; padding: 2rem; border-radius: 12px; width: 320px; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+        label { display: block; margin: .8rem 0 .25rem; font-size: .9rem; }
+        input { width: 100%; padding: .55rem; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
+        button { margin-top: 1.2rem; width: 100%; padding: .6rem; border: 0; border-radius: 6px; background: #1f5fbf; color: #fff; cursor: pointer; }
+        .err { color: #b00020; font-size: .85rem; margin-top: .6rem; }
+        .lang { display: block; text-align: center; margin-top: 1rem; font-size: .85rem; }
+    </style>
+</head>
+<body>
+    <form method="post">
+        <h2>@L["Portal sign in"]</h2>
+        <label asp-for="Input.Email">@L["Email"]</label>
+        <input asp-for="Input.Email" autocomplete="username" />
+        <label asp-for="Input.Password">@L["Password"]</label>
+        <input asp-for="Input.Password" autocomplete="current-password" />
+        @if (!string.IsNullOrEmpty(Model.Error)) { <div class="err">@Model.Error</div> }
+        <div class="err" asp-validation-summary="ModelOnly"></div>
+        <button type="submit">@L["Sign in"]</button>
+        <a class="lang" href="/culture/set?culture=@otherCulture&amp;redirectUri=@back">@otherName</a>
+    </form>
+</body>
+</html>
+

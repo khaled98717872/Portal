@@ -1,0 +1,195 @@
+﻿@page "/admin/roles"
+@attribute [Authorize(Policy = PlatformPermissions.RolesManage)]
+@using Portal.SharedKernel.Authorization
+@inject RoleAdminService RoleAdmin
+
+<PageTitle>@L["Roles"]</PageTitle>
+
+<h3>@L["Roles"]</h3>
+<p class="text-muted">@L["Roles are shared by all tenants. Permission changes reach users on their next sign-in."]</p>
+
+@if (_message is not null)
+{
+    <div class="alert alert-success py-2">@_message</div>
+}
+@if (_error is not null)
+{
+    <div class="alert alert-danger py-2">@_error</div>
+}
+
+<button class="btn btn-primary btn-sm mb-3" @onclick="StartCreate">@L["New role"]</button>
+
+<table class="table table-sm align-middle">
+    <thead>
+        <tr>
+            <th>@L["Role"]</th>
+            <th>@L["Permissions"]</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in _roles)
+        {
+            <tr>
+                <td>
+                    @r.Name
+                    @if (r.IsSystem)
+                    {
+                        <span class="badge text-bg-dark ms-1">@L["System"]</span>
+                    }
+                </td>
+                <td>
+                    @foreach (var p in r.Permissions)
+                    {
+                        <span class="badge text-bg-light border me-1">@p</span>
+                    }
+                </td>
+                <td class="text-end">
+                    @if (!r.IsSystem)
+                    {
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="() => StartEdit(r)">@L["Edit"]</button>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="() => Delete(r)">@L["Delete"]</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (_editing)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5>@(_isNew ? L["New role"].Value : L["Edit role: {0}", _name].Value)</h5>
+
+            @if (_isNew)
+            {
+                <div class="mb-3" style="max-width: 320px">
+                    <label class="form-label">@L["Name"]</label>
+                    <input class="form-control" @bind="_name" />
+                </div>
+            }
+
+            @foreach (var g in Catalog)
+            {
+                <h6 class="mt-3">@GroupTitle(g.Key)</h6>
+                @foreach (var p in g)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="@($"p-{p.Name}")"
+                               checked="@_selected.Contains(p.Name)"
+                               @onchange="e => Toggle(p.Name, (bool)e.Value!)" />
+                        <label class="form-check-label" for="@($"p-{p.Name}")">
+                            @L[p.Description] <code class="ms-1">@p.Name</code>
+                        </label>
+                    </div>
+                }
+            }
+
+            @if (_other.Count > 0)
+            {
+                <div class="mt-3 small text-muted">@(L["Also kept as is: {0}", string.Join(", ", _other)])</div>
+            }
+
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm" @onclick="Save">@L["Save"]</button>
+                <button class="btn btn-link btn-sm" @onclick="CloseForm">@L["Cancel"]</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private static readonly List<IGrouping<string, PermissionDefinition>> Catalog = ModuleCatalog.Modules
+        .SelectMany(m => m.Permissions)
+        .Concat(IdentityPermissions.All)
+        .GroupBy(p => p.Name.Split('.')[0])
+        .ToList();
+
+    private List<RoleInfo> _roles = [];
+    private readonly HashSet<string> _selected = new(StringComparer.OrdinalIgnoreCase);
+    private List<string> _other = [];
+    private bool _editing;
+    private bool _isNew;
+    private string _name = "";
+    private string? _message;
+    private string? _error;
+
+    private string GroupTitle(string key) =>
+        ModuleCatalog.Menu.TryGetValue(key, out var item)
+            ? L[item.Title].Value
+            : L[char.ToUpperInvariant(key[0]) + key[1..]].Value;
+
+    protected override async Task OnInitializedAsync() => await Run(Reload);
+
+    private async Task Reload() => _roles = await RoleAdmin.ListAsync();
+
+    private void StartCreate()
+    {
+        Clear();
+        _editing = true;
+        _isNew = true;
+        _name = "";
+        _selected.Clear();
+        _other = [];
+    }
+
+    private void StartEdit(RoleInfo role)
+    {
+        Clear();
+        _editing = true;
+        _isNew = false;
+        _name = role.Name;
+        _selected.Clear();
+        foreach (var p in role.Permissions) _selected.Add(p);
+
+        var known = Catalog.SelectMany(g => g).Select(p => p.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        _other = role.Permissions.Where(p => !known.Contains(p)).ToList();
+    }
+
+    private void Toggle(string permission, bool on)
+    {
+        if (on) _selected.Add(permission);
+        else _selected.Remove(permission);
+    }
+
+    private async Task Save() =>
+        await Run(async () =>
+        {
+            await RoleAdmin.SaveAsync(_name, _selected.ToList());
+            _message = L["Role saved."];
+            CloseForm();
+            await Reload();
+        });
+
+    private async Task Delete(RoleInfo role) =>
+        await Run(async () =>
+        {
+            await RoleAdmin.DeleteAsync(role.Name);
+            _message = L["Role deleted."];
+            await Reload();
+        });
+
+    private void CloseForm() => _editing = false;
+
+    private async Task Run(Func<Task> action)
+    {
+        Clear();
+        try
+        {
+            await action();
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or UnauthorizedAccessException)
+        {
+            _error = L[ex.Message];
+        }
+    }
+
+    private void Clear()
+    {
+        _message = null;
+        _error = null;
+    }
+}
+
+

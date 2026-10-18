@@ -1,0 +1,23 @@
+﻿@using System.Globalization
+@using Portal.SharedKernel.Localization
+@inject NavigationManager Navigation
+
+<button type="button" class="btn btn-sm btn-outline-light" @onclick="Switch">@_label</button>
+
+@code {
+    private string _target = PortalLocalization.English;
+    private string _label = "";
+
+    protected override void OnInitialized()
+    {
+        var isArabic = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "ar";
+        _target = isArabic ? PortalLocalization.English : PortalLocalization.Arabic;
+        _label = CultureInfo.GetCultureInfo(_target).Parent.NativeName;
+    }
+
+    private void Switch()
+    {
+        var current = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+        Navigation.NavigateTo($"culture/set?culture={_target}&redirectUri={Uri.EscapeDataString(current)}", forceLoad: true);
+    }
+}

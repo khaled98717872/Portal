@@ -1,0 +1,20 @@
+﻿<Router AppAssembly="typeof(Program).Assembly"
+        AdditionalAssemblies="Portal.Host.ModuleCatalog.UiAssemblies">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                @if (context.User.Identity?.IsAuthenticated == true)
+                {
+                    <p class="m-4 alert alert-warning">@L["You do not have permission to view this page."]</p>
+                }
+                else
+                {
+                    <RedirectToLogin />
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+</Router>
+
+

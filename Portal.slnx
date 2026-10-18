@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Documents/">
+    <Project Path="src/Modules/Documents/Portal.Modules.Documents.Application/Portal.Modules.Documents.Application.csproj" />
+    <Project Path="src/Modules/Documents/Portal.Modules.Documents.Contracts/Portal.Modules.Documents.Contracts.csproj" />
+    <Project Path="src/Modules/Documents/Portal.Modules.Documents.Domain/Portal.Modules.Documents.Domain.csproj" />
+    <Project Path="src/Modules/Documents/Portal.Modules.Documents.Infrastructure/Portal.Modules.Documents.Infrastructure.csproj" />
+    <Project Path="src/Modules/Documents/Portal.Modules.Documents.UI/Portal.Modules.Documents.UI.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Hr/">
+    <Project Path="src/Modules/Hr/Portal.Modules.Hr.Application/Portal.Modules.Hr.Application.csproj" />
+    <Project Path="src/Modules/Hr/Portal.Modules.Hr.Contracts/Portal.Modules.Hr.Contracts.csproj" />
+    <Project Path="src/Modules/Hr/Portal.Modules.Hr.Domain/Portal.Modules.Hr.Domain.csproj" />
+    <Project Path="src/Modules/Hr/Portal.Modules.Hr.Infrastructure/Portal.Modules.Hr.Infrastructure.csproj" />
+    <Project Path="src/Modules/Hr/Portal.Modules.Hr.UI/Portal.Modules.Hr.UI.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Portal.Host/Portal.Host.csproj" />
+    <Project Path="src/Portal.Identity/Portal.Identity.csproj" />
+    <Project Path="src/Portal.SharedKernel/Portal.SharedKernel.csproj" />
+    <Project Path="src/Portal.Tenancy/Portal.Tenancy.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,55 @@
+﻿@using Portal.SharedKernel.Authorization
+@using Portal.SharedKernel.Tenancy
+@using Portal.Tenancy
+@inject ITenantContext Tenant
+@inject IModuleAccessService Access
+
+@foreach (var item in _items)
+{
+    <div class="nav-item px-3">
+        <NavLink class="nav-link" href="@item.Href">@L[item.Title]</NavLink>
+    </div>
+}
+
+<AuthorizeView Policy="@IdentityPermissions.UsersAdminPolicy">
+    <Authorized>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="admin/users">@L["Users"]</NavLink>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Policy="@PlatformPermissions.RolesManage">
+    <Authorized>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="admin/roles">@L["Roles"]</NavLink>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Policy="@PlatformPermissions.TenantsManage">
+    <Authorized>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="admin/tenants">@L["Tenants"]</NavLink>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+<div class="nav-item px-3 mt-3">
+    <LanguageSwitcher />
+</div>
+
+@code {
+    private List<ModuleMenuItem> _items = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!Tenant.IsResolved) return;
+
+        var enabled = await Access.GetEnabledAsync(Tenant.TenantId);
+        _items = ModuleCatalog.Menu
+            .Where(m => enabled.Contains(m.Key))
+            .Select(m => m.Value)
+            .ToList();
+    }
+}

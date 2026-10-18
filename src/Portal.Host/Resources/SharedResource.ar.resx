@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Shell and menu -->
+  <data name="Home" xml:space="preserve"><value>الرئيسية</value></data>
+  <data name="Human Resources" xml:space="preserve"><value>الموارد البشرية</value></data>
+  <data name="Documents" xml:space="preserve"><value>المستندات</value></data>
+  <data name="Users" xml:space="preserve"><value>المستخدمون</value></data>
+  <data name="Roles" xml:space="preserve"><value>الأدوار</value></data>
+  <data name="Tenants" xml:space="preserve"><value>المؤسسات</value></data>
+  <data name="Identity" xml:space="preserve"><value>الهوية والمستخدمون</value></data>
+  <data name="You do not have permission to view this page." xml:space="preserve"><value>ليست لديك صلاحية لعرض هذه الصفحة.</value></data>
+
+  <!-- Common -->
+  <data name="Save" xml:space="preserve"><value>حفظ</value></data>
+  <data name="Cancel" xml:space="preserve"><value>إلغاء</value></data>
+  <data name="Edit" xml:space="preserve"><value>تعديل</value></data>
+  <data name="Delete" xml:space="preserve"><value>حذف</value></data>
+  <data name="Active" xml:space="preserve"><value>نشط</value></data>
+  <data name="Inactive" xml:space="preserve"><value>غير نشط</value></data>
+  <data name="Name" xml:space="preserve"><value>الاسم</value></data>
+  <data name="Status" xml:space="preserve"><value>الحالة</value></data>
+  <data name="Modules" xml:space="preserve"><value>الأنظمة</value></data>
+  <data name="Email" xml:space="preserve"><value>البريد الإلكتروني</value></data>
+  <data name="Tenant" xml:space="preserve"><value>المؤسسة</value></data>
+
+  <!-- Tenants page -->
+  <data name="Identifier" xml:space="preserve"><value>المعرّف</value></data>
+  <data name="Isolation" xml:space="preserve"><value>نوع العزل</value></data>
+  <data name="New tenant" xml:space="preserve"><value>مؤسسة جديدة</value></data>
+  <data name="Edit tenant" xml:space="preserve"><value>تعديل المؤسسة</value></data>
+  <data name="Connection string" xml:space="preserve"><value>نص الاتصال</value></data>
+  <data name="Subscribed modules" xml:space="preserve"><value>الأنظمة المشترك بها</value></data>
+  <data name="Deactivate" xml:space="preserve"><value>تعطيل</value></data>
+  <data name="Activate" xml:space="preserve"><value>تفعيل</value></data>
+  <data name="Tenant saved." xml:space="preserve"><value>تم حفظ المؤسسة.</value></data>
+  <data name="Tenant deactivated." xml:space="preserve"><value>تم تعطيل المؤسسة.</value></data>
+  <data name="Tenant activated." xml:space="preserve"><value>تم تفعيل المؤسسة.</value></data>
+  <data name="No expiry" xml:space="preserve"><value>بلا تاريخ انتهاء</value></data>
+  <data name="Expires {0}" xml:space="preserve"><value>ينتهي في {0}</value></data>
+  <data name="Optional last day of the subscription" xml:space="preserve"><value>اختياري: آخر يوم في الاشتراك</value></data>
+  <data name="SharedDatabase" xml:space="preserve"><value>قاعدة بيانات مشتركة</value></data>
+  <data name="DedicatedDatabase" xml:space="preserve"><value>قاعدة بيانات مخصصة</value></data>
+
+  <!-- Users page -->
+  <data name="New user" xml:space="preserve"><value>مستخدم جديد</value></data>
+  <data name="Full name" xml:space="preserve"><value>الاسم الكامل</value></data>
+  <data name="Disabled" xml:space="preserve"><value>معطّل</value></data>
+  <data name="Reset password" xml:space="preserve"><value>إعادة تعيين كلمة المرور</value></data>
+  <data name="Reset" xml:space="preserve"><value>إعادة تعيين</value></data>
+  <data name="Edit user: {0}" xml:space="preserve"><value>تعديل المستخدم: {0}</value></data>
+  <data name="Initial password" xml:space="preserve"><value>كلمة المرور المبدئية</value></data>
+  <data name="New password" xml:space="preserve"><value>كلمة المرور الجديدة</value></data>
+  <data name="Active (can sign in)" xml:space="preserve"><value>نشط (يمكنه تسجيل الدخول)</value></data>
+  <data name="Reset password: {0}" xml:space="preserve"><value>إعادة تعيين كلمة المرور: {0}</value></data>
+  <data name="User created." xml:space="preserve"><value>تم إنشاء المستخدم.</value></data>
+  <data name="User updated." xml:space="preserve"><value>تم تحديث المستخدم.</value></data>
+  <data name="Password reset." xml:space="preserve"><value>تمت إعادة تعيين كلمة المرور.</value></data>
+
+  <!-- Roles page -->
+  <data name="Role" xml:space="preserve"><value>الدور</value></data>
+  <data name="Permissions" xml:space="preserve"><value>الصلاحيات</value></data>
+  <data name="New role" xml:space="preserve"><value>دور جديد</value></data>
+  <data name="Edit role: {0}" xml:space="preserve"><value>تعديل الدور: {0}</value></data>
+  <data name="System" xml:space="preserve"><value>نظام</value></data>
+  <data name="Role saved." xml:space="preserve"><value>تم حفظ الدور.</value></data>
+  <data name="Role deleted." xml:space="preserve"><value>تم حذف الدور.</value></data>
+  <data name="Roles are shared by all tenants. Permission changes reach users on their next sign-in." xml:space="preserve"><value>الأدوار مشتركة بين جميع المؤسسات. تصل تغييرات الصلاحيات إلى المستخدمين عند تسجيل دخولهم التالي.</value></data>
+  <data name="Also kept as is: {0}" xml:space="preserve"><value>صلاحيات أخرى محفوظة كما هي: {0}</value></data>
+
+  <!-- Permission descriptions (declared by the modules) -->
+  <data name="View employees" xml:space="preserve"><value>عرض الموظفين</value></data>
+  <data name="Create employees" xml:space="preserve"><value>إنشاء موظفين</value></data>
+  <data name="Edit employees" xml:space="preserve"><value>تعديل الموظفين</value></data>
+  <data name="Delete employees" xml:space="preserve"><value>حذف الموظفين</value></data>
+  <data name="View audit log" xml:space="preserve"><value>عرض سجل التدقيق</value></data>
+  <data name="Manage users of the tenant" xml:space="preserve"><value>إدارة مستخدمي المؤسسة</value></data>
+
+  <!-- Messages thrown by the services (shown through L[ex.Message]) -->
+  <data name="You are not allowed to manage tenants." xml:space="preserve"><value>غير مسموح لك بإدارة المؤسسات.</value></data>
+  <data name="You are not allowed to manage users of this tenant." xml:space="preserve"><value>غير مسموح لك بإدارة مستخدمي هذه المؤسسة.</value></data>
+  <data name="You are not allowed to manage roles." xml:space="preserve"><value>غير مسموح لك بإدارة الأدوار.</value></data>
+  <data name="Tenant not found." xml:space="preserve"><value>لم يتم العثور على المؤسسة.</value></data>
+  <data name="Identifier: up to 63 characters, lowercase letters, digits and hyphens only." xml:space="preserve"><value>المعرّف: حتى 63 حرفاً، أحرف إنجليزية صغيرة وأرقام وشرطات فقط.</value></data>
+  <data name="Name is required." xml:space="preserve"><value>الاسم مطلوب.</value></data>
+  <data name="A connection string is required for a dedicated database." xml:space="preserve"><value>نص الاتصال مطلوب لقاعدة البيانات المخصصة.</value></data>
+  <data name="The platform tenant cannot be modified." xml:space="preserve"><value>لا يمكن تعديل مؤسسة المنصة.</value></data>
+  <data name="Isolation mode cannot be changed after creation (existing data would not move)." xml:space="preserve"><value>لا يمكن تغيير نوع العزل بعد الإنشاء (لن تنتقل البيانات الموجودة).</value></data>
+  <data name="You cannot modify your own account here." xml:space="preserve"><value>لا يمكنك تعديل حسابك من هنا.</value></data>
+  <data name="Could not obtain an admin token from the identity service." xml:space="preserve"><value>تعذّر الحصول على رمز الإدارة من خدمة الهوية.</value></data>
+  <data name="Empty response from the identity service." xml:space="preserve"><value>استجابة فارغة من خدمة الهوية.</value></data>
+  <data name="A valid email is required." xml:space="preserve"><value>البريد الإلكتروني الصحيح مطلوب.</value></data>
+  <data name="A password is required." xml:space="preserve"><value>كلمة المرور مطلوبة.</value></data>
+  <data name="A new password is required." xml:space="preserve"><value>كلمة المرور الجديدة مطلوبة.</value></data>
+  <data name="Role name: 2-64 characters, letters, digits, '-' and '_', starting with a letter." xml:space="preserve"><value>اسم الدور: من 2 إلى 64 حرفاً، أحرف وأرقام و'-' و'_'، ويبدأ بحرف.</value></data>
+  <data name="The role is assigned to users. Remove it from them first." xml:space="preserve"><value>الدور معيَّن لمستخدمين. أزله منهم أولاً.</value></data>
+</root>

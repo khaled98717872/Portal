@@ -1,0 +1,19 @@
+﻿/* Applied only when the page direction is RTL. Adjust after a visual review. */
+html[dir="rtl"] body {
+    font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif;
+}
+
+html[dir="rtl"] .nav-item .bi {
+    margin-right: 0 !important;
+    margin-left: 0.75rem !important;
+}
+
+html[dir="rtl"] .top-row {
+    justify-content: flex-start !important;
+}
+
+html[dir="rtl"] .top-row a,
+html[dir="rtl"] .top-row .btn-link {
+    margin-left: 0 !important;
+    margin-right: 1.5rem;
+}

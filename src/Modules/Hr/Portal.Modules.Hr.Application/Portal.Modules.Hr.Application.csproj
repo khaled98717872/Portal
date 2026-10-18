@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Portal.Modules.Hr.Domain\Portal.Modules.Hr.Domain.csproj" />
+    <ProjectReference Include="..\Portal.Modules.Hr.Contracts\Portal.Modules.Hr.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Portal.SharedKernel\Portal.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

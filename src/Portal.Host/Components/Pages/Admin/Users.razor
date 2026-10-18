@@ -1,0 +1,290 @@
+﻿@page "/admin/users"
+@attribute [Authorize(Policy = IdentityPermissions.UsersAdminPolicy)]
+@using Portal.SharedKernel.Authorization
+@using Portal.SharedKernel.Tenancy
+@using Portal.Tenancy
+@inject UserAdminService UserAdmin
+@inject TenantAdminService Tenants
+@inject AuthenticationStateProvider Auth
+
+<PageTitle>@L["Users"]</PageTitle>
+
+<h3>@L["Users"]</h3>
+
+@if (_message is not null)
+{
+    <div class="alert alert-success py-2">@_message</div>
+}
+@if (_error is not null)
+{
+    <div class="alert alert-danger py-2">@_error</div>
+}
+
+@if (_isPlatform)
+{
+    <div class="mb-3" style="max-width: 360px">
+        <label class="form-label">@L["Tenant"]</label>
+        <select class="form-select" @onchange="OnTenantChanged">
+            @foreach (var t in _tenantList)
+            {
+                <option value="@t.Id" selected="@(t.Id == _tenantId)">@t.Identifier - @t.Name</option>
+            }
+        </select>
+    </div>
+}
+
+<button class="btn btn-primary btn-sm mb-3" @onclick="StartCreate">@L["New user"]</button>
+
+<table class="table table-sm align-middle">
+    <thead>
+        <tr>
+            <th>@L["Email"]</th>
+            <th>@L["Name"]</th>
+            <th>@L["Roles"]</th>
+            <th>@L["Status"]</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in _users)
+        {
+            <tr>
+                <td>@u.Email</td>
+                <td>@u.FullName</td>
+                <td>
+                    @foreach (var r in u.Roles)
+                    {
+                        <span class="badge text-bg-secondary me-1">@r</span>
+                    }
+                </td>
+                <td>@(u.IsActive ? L["Active"] : L["Disabled"])</td>
+                <td class="text-end">
+                    <button class="btn btn-outline-secondary btn-sm" @onclick="() => StartEdit(u)">@L["Edit"]</button>
+                    <button class="btn btn-outline-warning btn-sm" @onclick="() => StartReset(u)">@L["Reset password"]</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (_mode is Mode.Create or Mode.Edit)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5>@(_mode == Mode.Create ? L["New user"].Value : L["Edit user: {0}", _email].Value)</h5>
+
+            <div class="row g-3">
+                @if (_mode == Mode.Create)
+                {
+                    <div class="col-md-5">
+                        <label class="form-label">@L["Email"]</label>
+                        <input class="form-control" @bind="_email" autocomplete="off" />
+                    </div>
+                }
+                <div class="col-md-7">
+                    <label class="form-label">@L["Full name"]</label>
+                    <input class="form-control" @bind="_fullName" />
+                </div>
+                @if (_mode == Mode.Create)
+                {
+                    <div class="col-md-5">
+                        <label class="form-label">@L["Initial password"]</label>
+                        <input class="form-control" type="password" @bind="_password" autocomplete="new-password" />
+                    </div>
+                }
+                @if (_mode == Mode.Edit)
+                {
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="user-active" @bind="_active" />
+                            <label class="form-check-label" for="user-active">@L["Active (can sign in)"]</label>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <h6 class="mt-4">@L["Roles"]</h6>
+            @foreach (var r in _roles)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="@($"r-{r.Name}")"
+                           checked="@_selectedRoles.Contains(r.Name)"
+                           @onchange="e => Toggle(r.Name, (bool)e.Value!)" />
+                    <label class="form-check-label" for="@($"r-{r.Name}")">
+                        @r.Name <span class="text-muted small">@Summary(r)</span>
+                    </label>
+                </div>
+            }
+
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm" @onclick="Save">@L["Save"]</button>
+                <button class="btn btn-link btn-sm" @onclick="CloseForm">@L["Cancel"]</button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (_mode == Mode.Reset && _editing is not null)
+{
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5>@(L["Reset password: {0}", _editing.Email])</h5>
+            <div style="max-width: 320px">
+                <label class="form-label">@L["New password"]</label>
+                <input class="form-control" type="password" @bind="_password" autocomplete="new-password" />
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-primary btn-sm" @onclick="Save">@L["Reset"]</button>
+                <button class="btn btn-link btn-sm" @onclick="CloseForm">@L["Cancel"]</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private enum Mode { None, Create, Edit, Reset }
+
+    private Mode _mode;
+    private bool _isPlatform;
+    private Guid _tenantId;
+    private List<TenantRow> _tenantList = [];
+    private List<UserInfo> _users = [];
+    private List<RoleInfo> _roles = [];
+    private UserInfo? _editing;
+    private string _email = "";
+    private string _fullName = "";
+    private string _password = "";
+    private bool _active = true;
+    private readonly HashSet<string> _selectedRoles = new(StringComparer.OrdinalIgnoreCase);
+    private string? _message;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync() =>
+        await Run(async () =>
+        {
+            var user = (await Auth.GetAuthenticationStateAsync()).User;
+            _isPlatform = PermissionMatcher.IsGranted(user, PlatformPermissions.UsersManage);
+
+            if (_isPlatform)
+            {
+                _tenantList = await Tenants.ListAsync();
+                _tenantId = _tenantList.FirstOrDefault(t => t.Id != PlatformTenant.Id)?.Id ?? PlatformTenant.Id;
+            }
+            else
+            {
+                _tenantId = Guid.TryParse(user.FindFirst("tenant_id")?.Value, out var id) ? id : Guid.Empty;
+            }
+
+            await Reload();
+        });
+
+    private async Task Reload()
+    {
+        _users = await UserAdmin.ListUsersAsync(_tenantId);
+        _roles = await UserAdmin.ListAssignableRolesAsync(_tenantId);
+    }
+
+    private async Task OnTenantChanged(ChangeEventArgs e) =>
+        await Run(async () =>
+        {
+            _tenantId = Guid.Parse((string)e.Value!);
+            CloseForm();
+            await Reload();
+        });
+
+    private void StartCreate()
+    {
+        Clear();
+        ResetFields();
+        _mode = Mode.Create;
+    }
+
+    private void StartEdit(UserInfo user)
+    {
+        Clear();
+        ResetFields();
+        _mode = Mode.Edit;
+        _editing = user;
+        _email = user.Email;
+        _fullName = user.FullName ?? "";
+        _active = user.IsActive;
+        foreach (var r in user.Roles) _selectedRoles.Add(r);
+    }
+
+    private void StartReset(UserInfo user)
+    {
+        Clear();
+        ResetFields();
+        _mode = Mode.Reset;
+        _editing = user;
+    }
+
+    private void Toggle(string role, bool on)
+    {
+        if (on) _selectedRoles.Add(role);
+        else _selectedRoles.Remove(role);
+    }
+
+    private static string Summary(RoleInfo role) =>
+        string.Join(", ", role.Permissions.Take(3)) + (role.Permissions.Count > 3 ? ", ..." : "");
+
+    private async Task Save() =>
+        await Run(async () =>
+        {
+            if (_mode == Mode.Create)
+            {
+                await UserAdmin.CreateAsync(_tenantId, _email, _fullName, _password, _selectedRoles.ToList());
+                _message = L["User created."];
+            }
+            else if (_mode == Mode.Edit && _editing is not null)
+            {
+                await UserAdmin.UpdateAsync(_tenantId, _editing.Id, _fullName, _active, _selectedRoles.ToList());
+                _message = L["User updated."];
+            }
+            else if (_mode == Mode.Reset && _editing is not null)
+            {
+                await UserAdmin.ResetPasswordAsync(_tenantId, _editing.Id, _password);
+                _message = L["Password reset."];
+            }
+
+            CloseForm();
+            await Reload();
+        });
+
+    private void CloseForm()
+    {
+        _mode = Mode.None;
+        ResetFields();
+    }
+
+    private void ResetFields()
+    {
+        _editing = null;
+        _email = "";
+        _fullName = "";
+        _password = "";
+        _active = true;
+        _selectedRoles.Clear();
+    }
+
+    private async Task Run(Func<Task> action)
+    {
+        Clear();
+        try
+        {
+            await action();
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or UnauthorizedAccessException)
+        {
+            _error = L[ex.Message];
+        }
+    }
+
+    private void Clear()
+    {
+        _message = null;
+        _error = null;
+    }
+}
+
+
